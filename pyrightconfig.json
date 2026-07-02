@@ -1,0 +1,6 @@
+{
+  "venvPath": ".",
+  "venv": "venv",
+  "pythonVersion": "3.12",
+  "typeshedPath": "/home/pranjal/.local/share/nvim/mason/packages/pyright/node_modules/pyright/dist/typeshed-fallback"
+}
