@@ -1,13 +1,7 @@
 
 import pyglet, pymunk
 from utils import get_coordinate
-from controller import GROUND_VELOCITY
-
-TITLE = 'GO SLIDE !'
-TITLE_FONT_SIZE = 36
-SLIDER_SIZE = 10
-GROUND_THICKNESS = 10
-GROUND_LEVEL = 20
+import conf
 
 class GameObject:
 
@@ -16,12 +10,14 @@ class GameObject:
             window:pyglet.window.BaseWindow,
             shape:pyglet.shapes.ShapeBase|None=None,
             body:pymunk.Body|None=None,
-            collider:pymunk.Shape|None=None
+            collider:pymunk.Shape|None=None,
+            space:pymunk.Space|None=None
     ):
         self.window = window
         self.shape = shape
         self.body = body
         self.collider = collider
+        self.space = space
     
     def update_pos(self, horizontal_percentage:float, verticle_percentage:float):
         pos = get_coordinate(self.window, horizontal_percentage, verticle_percentage)
@@ -34,15 +30,29 @@ class GameObject:
 
     def move_left(self):
         if self.body:
-            self.body.velocity = (-GROUND_VELOCITY, self.body.velocity.y)
+            self.body.velocity = (-conf.GROUND_VELOCITY, self.body.velocity.y)
 
     def move_right(self):
         if self.body:
-            self.body.velocity = (GROUND_VELOCITY, self.body.velocity.y)
+            self.body.velocity = (conf.GROUND_VELOCITY, self.body.velocity.y)
     
     def sync_shape(self):
         if self.shape and self.body:
             self.shape.position = self.body.position
+
+    def rebuild_collider(self):
+        self.space.remove(self.collider)
+        if isinstance(self.shape, pyglet.shapes.Line):
+            #add segment collider
+            ...
+        else:
+            collider = pymunk.Poly.create_box(
+                self.body,
+                (self.shape.width, self.shape.height)
+            )
+            collider.friction = self.collider.friction
+            self.collider = collider
+            self.space.add(self.collider)
 
 
 
@@ -72,9 +82,9 @@ class Draw:
 
     def draw_ground(self)->pyglet.shapes.ShapeBase:
         ground_shape = pyglet.shapes.Line(
-            0, GROUND_LEVEL,
-            self.window.width, GROUND_LEVEL,
-            thickness = GROUND_THICKNESS,
+            0, conf.GROUND_LEVEL,
+            self.window.width, conf.GROUND_LEVEL,
+            thickness = conf.GROUND_THICKNESS,
             color=(80,200,120),
             batch=self.batch
         )
@@ -84,17 +94,18 @@ class Draw:
         slider_shape = pyglet.shapes.Rectangle(
             get_coordinate(self.window, 50, None)[0],
             get_coordinate(self.window, None, 50)[1],
-            width=SLIDER_SIZE,
-            height=SLIDER_SIZE,
+            width=conf.SLIDER_SIZE,
+            height=conf.SLIDER_SIZE,
             color=(80,200,120),
             batch=self.batch
         )
-        slider_shape.anchor_position = (SLIDER_SIZE/2, SLIDER_SIZE/2)
+        slider_shape.anchor_position = (conf.SLIDER_SIZE/2, conf.SLIDER_SIZE/2)
         slider_body = pymunk.Body(
             mass=1,
             moment=float('inf'),
         )
         slider_body.position = get_coordinate(self.window, 50, 50)
+        self.space.add(slider_body)
         return slider_shape, slider_body
 
 
@@ -113,6 +124,7 @@ class Draw:
             moment=float('inf'),
         )
         wall_body.position = pos
+        self.space.add(wall_body)
         return wall_shape, wall_body
 
     def draw_box(self, pos, size):
@@ -134,7 +146,6 @@ class Draw:
                 size
             )
             collider.friction = friction
-            self.space.add(body, collider)
 
         elif collider_type == 'segment':
             collider = pymunk.Segment(
@@ -144,5 +155,6 @@ class Draw:
                 size[0]
             )
             collider.friction = friction
-            self.space.add(collider)
+        self.space.add(collider)
         return collider
+    
