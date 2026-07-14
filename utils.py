@@ -1,6 +1,4 @@
-
-
-import pyglet, pymunk
+import pyglet
 
 def get_coordinate(
         window:pyglet.window.BaseWindow,

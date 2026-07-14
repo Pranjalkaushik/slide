@@ -1,4 +1,5 @@
 import pyglet
+import random
 import conf
 from utils import get_coordinate
 from game_elements.base import GameObject, Draw
@@ -22,3 +23,7 @@ def get_wall(draw:Draw, window:pyglet.window.BaseWindow)->GameObject:
         space=draw.space
     )
     return wall
+
+
+def next_height(wall:GameObject):
+    return max(conf.SLIDER_SIZE*3, random.randrange(wall.shape.height-50, wall.shape.height+100))
