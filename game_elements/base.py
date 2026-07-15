@@ -11,13 +11,15 @@ class GameObject:
             shape:pyglet.shapes.ShapeBase|None=None,
             body:pymunk.Body|None=None,
             collider:pymunk.Shape|None=None,
-            space:pymunk.Space|None=None
+            label:pyglet.text.DocumentLabel|None=None,
+            space:pymunk.Space|None=None,
     ):
         self.window = window
         self.shape = shape
         self.body = body
         self.collider = collider
         self.space = space
+        self.label = label
     
     def update_pos(self, horizontal_percentage:float, verticle_percentage:float):
         from utils import get_coordinate
@@ -78,7 +80,8 @@ class Draw:
             x=pos[0],
             y=pos[1],
             anchor_x='center',
-            anchor_y='center'
+            anchor_y='center',
+            batch=self.batch
             )
         return t
 
@@ -87,7 +90,7 @@ class Draw:
             0, conf.GROUND_LEVEL,
             self.window.width, conf.GROUND_LEVEL,
             thickness = conf.GROUND_THICKNESS,
-            color=(80,200,120),
+            color=conf.GROUND_COLOR,
             batch=self.batch
         )
         return ground_shape
@@ -99,7 +102,7 @@ class Draw:
             get_coordinate(self.window, None, 50)[1],
             width=conf.SLIDER_SIZE,
             height=conf.SLIDER_SIZE,
-            color=(80,200,120),
+            color=conf.SLIDER_COLOR,
             batch=self.batch
         )
         slider_shape.anchor_position = (conf.SLIDER_SIZE/2, conf.SLIDER_SIZE/2)
@@ -118,7 +121,7 @@ class Draw:
             pos[1],
             width=width,
             height=height,
-            color=(80,200,120),
+            color=conf.WALL_COLOR,
             batch=self.batch
         )
         wall_shape.anchor_position = (width/2, height/2)

@@ -14,8 +14,14 @@ def get_coordinate(
         y = verticle_percentage * window.height / 100
     return x,y
 
+
+def are_in_contact(body_1:GameObject, body_2:GameObject):
+    if body_1.collider and body_2.collider:
+        overlaps = body_1.space.shape_query(body_1.collider)
+        return any([o.shape is body_2.collider for o in overlaps])
+
+
 def on_ground(body:GameObject) -> bool:
     ground = GameWorld.get_obj('ground')
-    if body.collider and ground and ground.collider:
-        overlaps = body.space.shape_query(body.collider)
-        return any(o.shape is ground.collider for o in overlaps)
+    if ground:
+        return bool(are_in_contact(body, ground))
