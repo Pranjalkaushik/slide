@@ -2,7 +2,7 @@ import pyglet
 import random
 import conf
 from utils import get_coordinate
-from game_elements.base import GameObject, Draw
+from game_elements.base import GameObject, Draw, GameWorld
 
 def get_wall(draw:Draw, window:pyglet.window.BaseWindow)->GameObject:
     wall_shape, wall_body = draw.draw_wall(
@@ -22,6 +22,7 @@ def get_wall(draw:Draw, window:pyglet.window.BaseWindow)->GameObject:
         collider=wall_collider,
         space=draw.space
     )
+    GameWorld.add_obj('wall', wall)
     return wall
 
 

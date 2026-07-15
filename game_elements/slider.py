@@ -1,6 +1,6 @@
 import pyglet
 import conf
-from game_elements.base import Draw, GameObject
+from game_elements.base import Draw, GameObject, GameWorld
 
 
 def get_slider(draw:Draw, window:pyglet.window.BaseWindow)->GameObject:
@@ -17,4 +17,5 @@ def get_slider(draw:Draw, window:pyglet.window.BaseWindow)->GameObject:
         collider=slider_collider,
         space=draw.space
     )
+    GameWorld.add_obj('slider', slider)
     return slider

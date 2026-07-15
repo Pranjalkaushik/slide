@@ -1,4 +1,5 @@
 import pyglet
+from game_elements.base import GameWorld, GameObject
 
 def get_coordinate(
         window:pyglet.window.BaseWindow,
@@ -11,3 +12,9 @@ def get_coordinate(
     if verticle_percentage:
         y = verticle_percentage * window.height / 100
     return x,y
+
+def on_ground(body:GameObject) -> bool:
+    ground = GameWorld.get_obj('ground')
+    if body.collider and ground and ground.collider:
+        overlaps = body.space.shape_query(body.collider)
+        return any(o.shape is ground.collider for o in overlaps)

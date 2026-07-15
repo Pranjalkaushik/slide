@@ -1,7 +1,7 @@
 import pyglet
 from pymunk import Space
 import conf
-from game_elements.base import GameObject, Draw
+from game_elements.base import GameObject, Draw, GameWorld
 
 def get_ground(draw:Draw, space:Space, window:pyglet.window.BaseWindow)->GameObject:
     ground_shape = draw.draw_ground()
@@ -18,4 +18,5 @@ def get_ground(draw:Draw, space:Space, window:pyglet.window.BaseWindow)->GameObj
         collider=ground_collider,
         space=draw.space
     )
+    GameWorld.add_obj('ground', ground)
     return ground

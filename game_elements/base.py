@@ -1,7 +1,7 @@
 
 import pyglet, pymunk
-from utils import get_coordinate
 import conf
+
 
 class GameObject:
 
@@ -20,6 +20,7 @@ class GameObject:
         self.space = space
     
     def update_pos(self, horizontal_percentage:float, verticle_percentage:float):
+        from utils import get_coordinate
         pos = get_coordinate(self.window, horizontal_percentage, verticle_percentage)
         if self.shape:
             self.shape.position = pos
@@ -41,18 +42,19 @@ class GameObject:
             self.shape.position = self.body.position
 
     def rebuild_collider(self):
-        self.space.remove(self.collider)
-        if isinstance(self.shape, pyglet.shapes.Line):
-            #add segment collider
-            ...
-        else:
-            collider = pymunk.Poly.create_box(
-                self.body,
-                (self.shape.width, self.shape.height)
-            )
-            collider.friction = self.collider.friction
-            self.collider = collider
-            self.space.add(self.collider)
+        if self.space and self.collider:
+            self.space.remove(self.collider)
+            if isinstance(self.shape, pyglet.shapes.Line):
+                #add segment collider
+                ...
+            else:
+                collider = pymunk.Poly.create_box(
+                    self.body,
+                    (self.shape.width, self.shape.height)
+                )
+                collider.friction = self.collider.friction
+                self.collider = collider
+                self.space.add(self.collider)
 
 
 
@@ -91,6 +93,7 @@ class Draw:
         return ground_shape
 
     def draw_slider(self)->tuple:
+        from utils import get_coordinate
         slider_shape = pyglet.shapes.Rectangle(
             get_coordinate(self.window, 50, None)[0],
             get_coordinate(self.window, None, 50)[1],
@@ -157,4 +160,14 @@ class Draw:
             collider.friction = friction
         self.space.add(collider)
         return collider
-    
+
+
+class GameWorld:
+
+    @classmethod
+    def get_obj(cls, name:str) -> GameObject|None:
+        return getattr(cls, name, None)
+
+    @classmethod
+    def add_obj(cls, name:str, obj:GameObject):
+        setattr(cls, name, obj)

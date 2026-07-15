@@ -9,7 +9,7 @@ from game_elements.ground import get_ground
 from game_elements.wall import get_wall, next_height
 from game_elements.slider import get_slider
 
-window = pyglet.window.Window(fullscreen=True)
+window = pyglet.window.Window()
 space = pymunk.Space()
 space.gravity = conf.GRAVITY
 draw_options = DrawOptions()
@@ -53,7 +53,7 @@ def on_draw():
 @window.event
 def on_key_press(symbol, modifier):
     if symbol == pyglet.window.key.SPACE:
-        jump(slider.body)
+        jump(slider)
 
 
 pyglet.clock.schedule_interval(update, 1 / 60)
