@@ -1,5 +1,6 @@
 import pyglet
 from game_elements.base import GameWorld, GameObject
+import conf
 
 def get_coordinate(
         window:pyglet.window.BaseWindow,

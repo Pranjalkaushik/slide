@@ -29,13 +29,13 @@ class GameObject:
         if self.collider:
             self.collider.position = pos
 
-    def move_left(self):
+    def move_left(self, multiplier=1):
         if self.body:
-            self.body.velocity = (-conf.GROUND_VELOCITY, self.body.velocity.y)
+            self.body.velocity = (-conf.GROUND_VELOCITY*multiplier, self.body.velocity.y)
 
-    def move_right(self):
+    def move_right(self, multiplier=1):
         if self.body:
-            self.body.velocity = (conf.GROUND_VELOCITY, self.body.velocity.y)
+            self.body.velocity = (conf.GROUND_VELOCITY*multiplier, self.body.velocity.y)
     
     def sync_shape(self):
         if self.shape and self.body:

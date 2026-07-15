@@ -3,13 +3,13 @@ import conf
 import random
 from pymunk.pyglet_util import DrawOptions
 from controller import jump
-from utils import get_coordinate
+from utils import get_coordinate, on_ground
 from game_elements.base import Draw 
 from game_elements.ground import get_ground
 from game_elements.wall import get_wall, next_height
 from game_elements.slider import get_slider
 
-window = pyglet.window.Window()
+window = pyglet.window.Window(fullscreen=True)
 space = pymunk.Space()
 space.gravity = conf.GRAVITY
 draw_options = DrawOptions()
@@ -33,12 +33,19 @@ def update(frame_dt):
         space.step(DT)
         _accum -= DT
     slider.sync_shape()
+    if on_ground(slider):
+        conf.JUMP_COUNT = 2
     wall.move_left()
-    if wall.body and wall.body.position.x < get_coordinate(window, 1, None)[0]:
+    if wall.body and wall.body.position.x < get_coordinate(window, -5, None)[0]:
+        # move wall to start
         wall.shape.height = next_height(wall)
         wall.shape.anchor_position = (wall.shape.width/2, wall.shape.height/2)
         wall.rebuild_collider()
         wall.body.position = (get_coordinate(window, 99, None)[0], conf.GROUND_LEVEL+wall.shape.height/2)
+        
+        # move slider a bit further
+        slider.move_right(1.5)
+
         conf.GROUND_VELOCITY = min(conf.MAX_GROUND_VELOCITY, random.randrange(conf.GROUND_VELOCITY, conf.GROUND_VELOCITY+50)) 
     wall.sync_shape()
 
@@ -47,7 +54,7 @@ def update(frame_dt):
 def on_draw():
     window.clear()
     batch.draw()
-    space.debug_draw(draw_options)
+    #space.debug_draw(draw_options)
 
 
 @window.event
