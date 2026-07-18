@@ -31,11 +31,11 @@ class GameObject:
         if self.collider:
             self.collider.position = pos
 
-    def move_left(self, multiplier=1):
+    def move_left(self, multiplier:float=1.0):
         if self.body:
             self.body.velocity = (-conf.GROUND_VELOCITY*multiplier, self.body.velocity.y)
 
-    def move_right(self, multiplier=1):
+    def move_right(self, multiplier:float=1.0):
         if self.body:
             self.body.velocity = (conf.GROUND_VELOCITY*multiplier, self.body.velocity.y)
     

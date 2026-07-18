@@ -1,3 +1,5 @@
+from typing import List
+
 import pyglet
 from game_elements.base import GameWorld, GameObject
 import conf
@@ -15,13 +17,12 @@ def get_coordinate(
     return x,y
 
 
-def are_in_contact(body_1:GameObject, body_2:GameObject):
-    if body_1.collider and body_2.collider:
-        overlaps = body_1.space.shape_query(body_1.collider)
-        return any([o.shape is body_2.collider for o in overlaps])
+def are_in_contact(body_1:GameObject, bodies:List[GameObject]):
+    overlaps = body_1.space.shape_query(body_1.collider)
+    return any([o.shape in [i.collider for i in bodies] for o in overlaps])
 
 
 def on_ground(body:GameObject) -> bool:
     ground = GameWorld.get_obj('ground')
     if ground:
-        return bool(are_in_contact(body, ground))
+        return bool(are_in_contact(body, [ground,]))

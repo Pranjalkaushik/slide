@@ -22,7 +22,7 @@ def get_wall(draw:Draw, window:pyglet.window.BaseWindow)->GameObject:
         collider=wall_collider,
         space=draw.space
     )
-    GameWorld.add_obj('wall', wall)
+    GameWorld.add_obj(f'wall{id(wall)}', wall)
     return wall
 
 
