@@ -1,3 +1,4 @@
+import datetime
 import pyglet, pymunk
 import conf
 import random
@@ -10,7 +11,7 @@ from game_elements.wall import get_wall, next_height
 from game_elements.slider import get_slider
 from game_elements.label import get_label
 
-window = pyglet.window.Window(fullscreen=True)
+window = pyglet.window.Window()
 space = pymunk.Space()
 space.gravity = conf.GRAVITY
 draw_options = DrawOptions()
@@ -23,7 +24,8 @@ wall = get_wall(d, window)
 slider = get_slider(d, window)
 
 walls = [wall,]
-
+last_wall_create_time = datetime.datetime.now()
+to_add = []
 
 DT = 1 / 120
 _accum = 0
@@ -35,6 +37,8 @@ def update(frame_dt):
     global _accum
     global wall_direction
     global points
+    global last_wall_create_time
+    global to_add
     
     if (slider.body.position[0] <  get_coordinate(window, -1, None)[0]) or are_in_contact(slider, walls):
         label.label.text = "Game Over !"
@@ -49,38 +53,50 @@ def update(frame_dt):
         conf.JUMP_COUNT = 2
    
     to_delete = []
-    to_add = []
     
+    updated_to_add = [] 
+    for wall, timedelta in to_add:
+        if timedelta <= datetime.datetime.now() - last_wall_create_time:
+            walls.append(wall)
+            wall_pos[f'wall{id(wall)}'] = wall.body.position
+            last_wall_create_time = datetime.datetime.now()
+        else:
+            updated_to_add += [(wall, timedelta),]
+
+    to_add = updated_to_add
+    print(walls, to_add, datetime.datetime.now() - last_wall_create_time)
+    if random.randrange(0,10) > 6:
+        to_add.append((get_wall(d, window), datetime.timedelta(seconds=random.randrange(2,10))))
     for wall in walls:
         slider_pos = slider.body.position
         # before the move
         wall_pos_x_bm = wall_pos[f'wall{id(wall)}'][0]
+        print(f"\n---------{frame_dt}")
         wall.move_left()
+        print("=========")
         # after the move
         wall_pos_x_am = wall.body.position[0]
         if wall_pos_x_bm > slider_pos[0] and wall_pos_x_am < slider_pos[0]:
-            slider.move_right(1.5)
+            #slider.move_right(1.5)
             points += 1
             label.label.text = str(points)
        
         if wall.body.position[0] < get_coordinate(window, -5, None)[0]:
             to_delete += [wall]
-            to_add.append(get_wall(d, window))
+            #to_add.append((get_wall(d, window), datetime.timedelta(seconds=3)))
             conf.GROUND_VELOCITY = min(conf.MAX_GROUND_VELOCITY, random.randrange(conf.GROUND_VELOCITY, conf.GROUND_VELOCITY+100)) 
         wall.sync_shape()
         wall_pos[f'wall{id(wall)}'] = wall.body.position
     
+    print(to_delete, '<<<<<<<')
+
     for wall in to_delete:
         space.remove(wall.body)
         space.remove(wall.collider)
         delattr(GameWorld, f"wall{id(wall)}")
         walls.remove(wall)
 
-    for wall in to_add:
-        walls.append(wall)
-        wall_pos[f'wall{id(wall)}'] = wall.body.position
-
-    
+        
 
 
 @window.event
